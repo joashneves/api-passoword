@@ -1,21 +1,25 @@
 import bcryptjs from "bcryptjs";
 
-const PEPPER = process.env.PEPPER || "Bell_Pepper";
+const PEPPER: string = process.env.PEPPER || "Bell_Pepper";
 
-async function hash(password) {
-  const rounds = getNumberOfRounds();
-  const spicyPassword = password + PEPPER;
+async function hash(password: string): Promise<string> {
+  const rounds: number = getNumberOfRounds();
+  const spicyPassword: string = password + PEPPER;
   return await bcryptjs.hash(spicyPassword, rounds);
 }
 
-function getNumberOfRounds() {
+function getNumberOfRounds(): number {
   return process.env.NODE_ENV === "production" ? 14 : 1;
 }
 
-async function compare(providePassowrd, storedPassword) {
-  const spicyProvidePassword = providePassowrd + PEPPER;
-  return await bcryptjs.compare(spicyProvidePassword, storedPassword);
+async function compare(
+  providedPassword: string,
+  storedPassword: string
+): Promise<boolean> {
+  const spicyProvidedPassword: string = providedPassword + PEPPER;
+  return await bcryptjs.compare(spicyProvidedPassword, storedPassword);
 }
+
 const password = {
   hash,
   compare,
