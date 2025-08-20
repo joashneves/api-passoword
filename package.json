@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && next dev",    "build": "next build",
     "start": "next start",
     "test:watch": "jest --watchAll --runInBand --verbose",
     "services:up": "docker compose -f infra/compose.yaml up -d",
@@ -35,6 +34,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.0",
+    "cz-conventional-changelog": "^3.0.1",
     "jest": "^30.0.5",
     "prettier": "3.6.2",
     "ts-jest": "^29.4.1",
