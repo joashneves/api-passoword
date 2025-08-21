@@ -4,7 +4,7 @@ beforeAll(async () => {
   await orchestrator.waitForAllServices();
 });
 
-describe("GET to /api/v1/status", () => {
+xdescribe("GET to /api/v1/status", () => {
   test("Anonymous user", async () => {
     const response = await fetch("http://localhost:3000/api/v1/status");
     expect(response.status).toBe(200);

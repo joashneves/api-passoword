@@ -23,8 +23,33 @@ async function create(usersInputValues: UserInput): Promise<User> {
   await validateUniqueEmail(usersInputValues.email);
   await validateUniqueUsername(usersInputValues.username);
   await hashPasswordInObject(usersInputValues);
+
+    // Se o banco estiver vazio, primeiro usuário vira admin
+  if (!usersInputValues.role) {
+    const result = await database.query({ text: 'SELECT COUNT(*) FROM users' });
+    usersInputValues.role = result.rows[0].count === '0' ? 'admin' : 'commun';
+  }
+
+  await validateUniqueAdmin(usersInputValues);
   const newUser = await runInsertQuery(usersInputValues);
   return newUser;
+
+  async function validateUniqueAdmin(userInputValues: UserInput): Promise<void> {
+  if (userInputValues.role === 'admin') {
+    const result = await database.query({
+      text: 'SELECT COUNT(*) FROM users WHERE role = $1',
+      values: ['admin'],
+    });
+
+    if (parseInt(result.rows[0].count) > 0) {
+      throw new ValidationError({
+        message: 'Já existe um administrador',
+        action: 'Apenas um usuário pode ter role admin',
+      });
+    }
+  }
+}
+
 
   async function runInsertQuery(usersInputValues: UserInput): Promise<User> {
     const result = await database.query({
