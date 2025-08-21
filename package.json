@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && next dev",
+    "dev:only": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "npm run services:up && concurrently -n next,jest --hide next -k -s command-jest \"next dev\" \"jest --runInBand --verbose\"",
     "test:watch": "jest --watchAll --runInBand --verbose",
     "services:up": "docker compose -f infra/compose.yaml up -d",
     "services:down": "docker compose -f infra/compose.yaml down",
@@ -26,8 +28,10 @@
     "next-connect": "^1.0.0",
     "node-pg-migrate": "^8.0.3",
     "pg": "^8.16.3",
+    "primereact": "^10.9.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "swr": "^2.3.6",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

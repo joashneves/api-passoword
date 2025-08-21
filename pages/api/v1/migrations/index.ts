@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import migrator from "@/models/migrator";
 
+
 export default async function handler(req:NextApiRequest, res: NextApiResponse) {
   if(req.method === 'POST'){
-    postHandler(req, res);
+    return postHandler(req, res);
   }else if (req.method === 'GET'){
-    getHandler(req, res)
+   return getHandler(req, res)
   }
   else{
    return res.status(405).json({ message: "Method not allowed" });
