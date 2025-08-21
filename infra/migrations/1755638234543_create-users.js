@@ -20,10 +20,10 @@ exports.up = (pgm) => {
       type: "varchar(60)",
       notNull: true,
     },
-    role:{
+    role: {
       type: "varchar(60)",
       notNull: true,
-      default: 'commun'
+      default: "commun",
     },
     created_at: {
       notNull: true,

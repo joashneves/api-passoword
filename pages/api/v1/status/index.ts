@@ -4,7 +4,7 @@ import database from "infra/database";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method !== "GET") {
     return res.status(405).json({ message: "Method not allowed" });
@@ -17,7 +17,7 @@ export default async function handler(
     const databaseVersionValue = databaseVersionResult.rows[0].server_version;
 
     const databaseMaxConnectionsResult = await database.query(
-      "SHOW max_connections;"
+      "SHOW max_connections;",
     );
     const databaseMaxConnectionsValue =
       databaseMaxConnectionsResult.rows[0].max_connections;

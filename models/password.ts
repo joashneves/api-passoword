@@ -14,7 +14,7 @@ function getNumberOfRounds(): number {
 
 async function compare(
   providedPassword: string,
-  storedPassword: string
+  storedPassword: string,
 ): Promise<boolean> {
   const spicyProvidedPassword: string = providedPassword + PEPPER;
   return await bcryptjs.compare(spicyProvidedPassword, storedPassword);

@@ -9,18 +9,25 @@ const ENV_PATH = ".env.development";
 
 function formatMigrationOutput(stdout: string) {
   if (stdout.includes("No migrations to run")) {
-    return { status: "done", message: "Todas as migrations já foram aplicadas ✅" };
+    return {
+      status: "done",
+      message: "Todas as migrations já foram aplicadas ✅",
+    };
   }
   if (stdout.includes("Migrations complete")) {
-    return { status: "pending", message: "⚠️ Existem migrations pendentes" };  
-  }    
-  return { status: "unknown", message: "Não foi possível determinar o status das migrations ❓", raw: stdout };
+    return { status: "pending", message: "⚠️ Existem migrations pendentes" };
+  }
+  return {
+    status: "unknown",
+    message: "Não foi possível determinar o status das migrations ❓",
+    raw: stdout,
+  };
 }
 
 async function listPendingMigrations() {
   try {
     const { stdout, stderr } = await execAsync(
-      `node-pg-migrate up -m ${MIGRATIONS_DIR} --envPath ${ENV_PATH} --dry-run`
+      `node-pg-migrate up -m ${MIGRATIONS_DIR} --envPath ${ENV_PATH} --dry-run`,
     );
 
     if (stderr) {

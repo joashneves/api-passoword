@@ -56,7 +56,7 @@ async function create(userId: number): Promise<Session> {
   async function runInsertQuery(
     token: string,
     userId: number,
-    expiresAt: Date
+    expiresAt: Date,
   ): Promise<Session> {
     const results: QueryResult<Session> = await database.query({
       text: `
@@ -82,7 +82,7 @@ async function renew(sessionId: number): Promise<Session> {
 
   async function runUpdateQuery(
     sessionId: number,
-    expiresAt: Date
+    expiresAt: Date,
   ): Promise<Session> {
     const results: QueryResult<Session> = await database.query({
       text: `

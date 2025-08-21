@@ -1,4 +1,3 @@
-
 exports.up = (pgm) => {
   pgm.createTable("sessions", {
     id: {

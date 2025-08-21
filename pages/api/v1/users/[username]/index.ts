@@ -2,7 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import user from "@/models/user";
 import { NotFoundError } from "@/infra/errors";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method === "GET") {
     return getHandler(req, res);
   }
@@ -20,7 +23,6 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 
     const userFound = await user.findOneByUsername(usernameQuery);
     return res.status(200).json(userFound);
-
   } catch (err: any) {
     if (err instanceof NotFoundError) {
       return res.status(404).json({ message: err.message, action: err.action });

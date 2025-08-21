@@ -24,6 +24,12 @@
       "infra": ["infra/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "models/migrator.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "models/migrator.ts"
+  ],
   "exclude": ["node_modules"]
 }

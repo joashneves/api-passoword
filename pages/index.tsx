@@ -1,10 +1,14 @@
 import { Message } from "primereact/message";
 import { Button } from "primereact/button";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import styles from "./page.module.css";
 import useSWRMutation from "swr/mutation";
+import useSWR from "swr";
+import { useRouter } from "next/router";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type CreateUserPayload = {
   username: string;
@@ -65,6 +69,7 @@ function InitialForm() {
         password: password,
       });
       alert("Usuário criado com sucesso!");
+      router.push("/admin/login"); // redireciona depois de criar
     } catch (err: any) {
       alert(`Erro: ${err.message}`);
     }
@@ -114,8 +119,7 @@ function InitialForm() {
             }
             icon="pi pi-user"
             className="w-10rem mx-auto"
-           onClick={() => CreateUserAdmin(username, email, password)} // ✅ aqui
-  //             disabled={isMigrating || isCreating}
+            onClick={() => CreateUserAdmin(username, email, password)}
           />
         </div>
       </div>
@@ -124,10 +128,27 @@ function InitialForm() {
 }
 
 export default function Home() {
+  const router = useRouter();
+
+  // --- SWR para validar se migrations estão aplicadas ---
+  const { data, error, isLoading } = useSWR("/api/v1/migrations", fetcher);
+
+  useEffect(() => {
+    if (data) {
+      // aqui você define sua validação
+      if (
+        data.status === "done" ||
+        (Array.isArray(data) && data.length === 0)
+      ) {
+        router.push("/admin/login");
+      }
+    }
+  }, [data, router]);
+
   return (
     <div className={styles.page}>
-      <h1>Hellow word</h1>
-      <InitialForm />
+      <h1>Crie o usuario admin</h1>
+      {isLoading ? <></> : <InitialForm />}
     </div>
   );
 }

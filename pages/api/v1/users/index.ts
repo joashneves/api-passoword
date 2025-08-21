@@ -8,19 +8,18 @@ interface UserInput {
   [key: string]: any;
 }
 
-export default async function handler(req:NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   // api/v1/users
-  if(req.method === 'POST'){
-    return postHandler(req, res)
-  }
-  else if(req.method === 'GET'){
-        return getHandler(req, res);
-  }
-  else{
+  if (req.method === "POST") {
+    return postHandler(req, res);
+  } else if (req.method === "GET") {
+    return getHandler(req, res);
+  } else {
     return res.status(405).json({ message: "Method not allowed" });
-
   }
-  
 }
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -33,14 +32,13 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-
-async function postHandler(req:NextApiRequest, res: NextApiResponse) {
-  try{
-  const usersInputValues = req.body;
-  console.log(usersInputValues)
-  const newUser = await user.create(usersInputValues);
-  return res.status(201).json(newUser);
-    } catch (err: any) {
+async function postHandler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const usersInputValues = req.body;
+    console.log(usersInputValues);
+    const newUser = await user.create(usersInputValues);
+    return res.status(201).json(newUser);
+  } catch (err: any) {
     if (err instanceof ValidationError) {
       return res.status(err.statusCode).json(err.toJSON());
     }

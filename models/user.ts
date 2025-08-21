@@ -24,37 +24,37 @@ async function create(usersInputValues: UserInput): Promise<User> {
   await validateUniqueUsername(usersInputValues.username);
   await hashPasswordInObject(usersInputValues);
 
-    // Define a role
+  // Define a role
   const result = await database.query({
     text: `SELECT COUNT(*) FROM users WHERE role = $1`,
-    values: ['admin'],
+    values: ["admin"],
   });
   const adminExists = parseInt(result.rows[0].count) > 0;
 
   // Se não existe admin, o primeiro será admin, senão commum
-  usersInputValues.role = adminExists ? 'commum' : 'admin';
-
+  usersInputValues.role = adminExists ? "commum" : "admin";
 
   await validateUniqueAdmin(usersInputValues);
   const newUser = await runInsertQuery(usersInputValues);
   return newUser;
 
-  async function validateUniqueAdmin(userInputValues: UserInput): Promise<void> {
-  if (userInputValues.role === 'admin') {
-    const result = await database.query({
-      text: 'SELECT COUNT(*) FROM users WHERE role = $1',
-      values: ['admin'],
-    });
-
-    if (parseInt(result.rows[0].count) > 0) {
-      throw new ValidationError({
-        message: 'Já existe um administrador',
-        action: 'Apenas um usuário pode ter role admin',
+  async function validateUniqueAdmin(
+    userInputValues: UserInput,
+  ): Promise<void> {
+    if (userInputValues.role === "admin") {
+      const result = await database.query({
+        text: "SELECT COUNT(*) FROM users WHERE role = $1",
+        values: ["admin"],
       });
+
+      if (parseInt(result.rows[0].count) > 0) {
+        throw new ValidationError({
+          message: "Já existe um administrador",
+          action: "Apenas um usuário pode ter role admin",
+        });
+      }
     }
   }
-}
-
 
   async function runInsertQuery(usersInputValues: UserInput): Promise<User> {
     const result = await database.query({
@@ -63,7 +63,12 @@ async function create(usersInputValues: UserInput): Promise<User> {
         VALUES ($1, $2, $3, $4)
         RETURNING *;
       `,
-      values: [usersInputValues.username, usersInputValues.email, usersInputValues.password, usersInputValues.role,],
+      values: [
+        usersInputValues.username,
+        usersInputValues.email,
+        usersInputValues.password,
+        usersInputValues.role,
+      ],
     });
     return result.rows[0];
   }
@@ -126,7 +131,9 @@ async function findOneByEmail(email: string): Promise<User> {
   }
 }
 
-async function validateUniqueUsername(username: string): Promise<User | undefined> {
+async function validateUniqueUsername(
+  username: string,
+): Promise<User | undefined> {
   const result = await database.query({
     text: `SELECT username FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1;`,
     values: [username],
@@ -154,12 +161,17 @@ async function validateUniqueEmail(email: string): Promise<User | undefined> {
   return result.rows[0];
 }
 
-async function hashPasswordInObject(usersInputValues: UserInput): Promise<void> {
+async function hashPasswordInObject(
+  usersInputValues: UserInput,
+): Promise<void> {
   const passwordHash = await password.hash(usersInputValues.password);
   usersInputValues.password = passwordHash;
 }
 
-async function update(username: string, userInputValues: Partial<UserInput>): Promise<User> {
+async function update(
+  username: string,
+  userInputValues: Partial<UserInput>,
+): Promise<User> {
   const currentUser = await findOneByUsername(username);
 
   if ("email" in userInputValues) {
@@ -167,7 +179,10 @@ async function update(username: string, userInputValues: Partial<UserInput>): Pr
   }
 
   if ("username" in userInputValues) {
-    if (currentUser.username.toLowerCase() !== userInputValues.username!.toLowerCase()) {
+    if (
+      currentUser.username.toLowerCase() !==
+      userInputValues.username!.toLowerCase()
+    ) {
       await validateUniqueUsername(userInputValues.username!);
     }
   }
@@ -180,7 +195,10 @@ async function update(username: string, userInputValues: Partial<UserInput>): Pr
   const updatedUser = await runUpdateQuery(userWithNewValues, userInputValues);
   return updatedUser;
 
-  async function runUpdateQuery(userWithNewValues: User, userInputValues: Partial<UserInput>): Promise<User> {
+  async function runUpdateQuery(
+    userWithNewValues: User,
+    userInputValues: Partial<UserInput>,
+  ): Promise<User> {
     const result = await database.query({
       text: `
         UPDATE users
