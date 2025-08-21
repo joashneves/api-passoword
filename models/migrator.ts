@@ -1,50 +1,44 @@
-import  { RunnerOption } from "node-pg-migrate";
+// models/migrator.ts
+import { exec } from "node:child_process";
+import { promisify } from "node:util";
 import { resolve } from "node:path";
-import { Client } from "pg";
-import database from "infra/database.js";
 
-// opções padrão do runner
-const defaultMigrationOptions: RunnerOption = {
-  dryRun: true,
-  dir: resolve("infra", "migrations"),
-  direction: "up",
-  log: () => {},
-  verbose: true,
-  migrationsTable: "pgmigrations",
-};
+const execAsync = promisify(exec);
 
-async function listPendingMigrations(): Promise<string[]> {
-  let dbClient: Client | undefined;
+const MIGRATIONS_DIR = resolve("infra", "migrations");
+const ENV_PATH = ".env.development";
 
+async function listPendingMigrations(): Promise<string> {
   try {
-    dbClient = await database.getNewClient();
+    const { stdout, stderr } = await execAsync(
+      `npm run migrations:up`
+    );
 
-    const pendingMigrations = await migrationRunner({
-      ...defaultMigrationOptions,
-      dbClient,
-    });
+    if (stderr) {
+      console.error(stderr);
+    }
 
-    return pendingMigrations;
-  } finally {
-    await dbClient?.end();
+    return stdout;
+  } catch (err) {
+    console.error("Erro ao listar migrations:", err);
+    throw err;
   }
 }
 
-async function runPendingMigrations(): Promise<string[]> {
-  let dbClient: Client | undefined;
-
+async function runPendingMigrations(): Promise<string> {
   try {
-    dbClient = await database.getNewClient();
+    const { stdout, stderr } = await execAsync(
+      `npm run migrations:up`
+    );
 
-    const migratedMigrations = await migrationRunner({
-      ...defaultMigrationOptions,
-      dbClient,
-      dryRun: false,
-    });
+    if (stderr) {
+      console.error(stderr);
+    }
 
-    return migratedMigrations;
-  } finally {
-    await dbClient?.end();
+    return stdout;
+  } catch (err) {
+    console.error("Erro ao rodar migrations:", err);
+    throw err;
   }
 }
 
