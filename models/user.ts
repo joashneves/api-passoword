@@ -24,11 +24,16 @@ async function create(usersInputValues: UserInput): Promise<User> {
   await validateUniqueUsername(usersInputValues.username);
   await hashPasswordInObject(usersInputValues);
 
-    // Se o banco estiver vazio, primeiro usuário vira admin
-  if (!usersInputValues.role) {
-    const result = await database.query({ text: 'SELECT COUNT(*) FROM users' });
-    usersInputValues.role = result.rows[0].count === '0' ? 'admin' : 'commun';
-  }
+    // Define a role
+  const result = await database.query({
+    text: `SELECT COUNT(*) FROM users WHERE role = $1`,
+    values: ['admin'],
+  });
+  const adminExists = parseInt(result.rows[0].count) > 0;
+
+  // Se não existe admin, o primeiro será admin, senão commum
+  usersInputValues.role = adminExists ? 'commum' : 'admin';
+
 
   await validateUniqueAdmin(usersInputValues);
   const newUser = await runInsertQuery(usersInputValues);
@@ -54,11 +59,11 @@ async function create(usersInputValues: UserInput): Promise<User> {
   async function runInsertQuery(usersInputValues: UserInput): Promise<User> {
     const result = await database.query({
       text: `
-        INSERT INTO users (username, email, password)
-        VALUES ($1, $2, $3)
+        INSERT INTO users (username, email, password, role)
+        VALUES ($1, $2, $3, $4)
         RETURNING *;
       `,
-      values: [usersInputValues.username, usersInputValues.email, usersInputValues.password],
+      values: [usersInputValues.username, usersInputValues.email, usersInputValues.password, usersInputValues.role,],
     });
     return result.rows[0];
   }
@@ -197,12 +202,20 @@ async function update(username: string, userInputValues: Partial<UserInput>): Pr
   }
 }
 
+async function findAll(): Promise<User[]> {
+  const result = await database.query({
+    text: `SELECT id, username, email, role, created_at, updated_at FROM users;`,
+  });
+  return result.rows;
+}
+
 const user = {
   create,
   findOneById,
   findOneByUsername,
   findOneByEmail,
   update,
+  findAll,
 };
 
 export default user;

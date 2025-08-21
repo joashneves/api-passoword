@@ -9,14 +9,28 @@ interface UserInput {
 }
 
 export default async function handler(req:NextApiRequest, res: NextApiResponse) {
+  // api/v1/users
   if(req.method === 'POST'){
     return postHandler(req, res)
+  }
+  else if(req.method === 'GET'){
+        return getHandler(req, res);
   }
   else{
     return res.status(405).json({ message: "Method not allowed" });
 
   }
   
+}
+
+async function getHandler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const users = await user.findAll();
+    return res.status(200).json(users);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Erro interno" });
+  }
 }
 
 
