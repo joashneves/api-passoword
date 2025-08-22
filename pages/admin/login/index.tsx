@@ -22,11 +22,11 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/v1/login", {
+      const res = await fetch("/api/v1/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          identifier: userOrEmail, // username ou email
+          email: userOrEmail, // username ou email
           password,
         }),
       });
@@ -36,7 +36,10 @@ export default function Login() {
         throw new Error(error.message || "Erro ao fazer login");
       }
 
-      const data = await res.json();
+      const resCookie = await fetch("/api/v1/user");
+
+      const data = await resCookie.json();
+      console.log(data);
       // aqui você pode salvar token/cookie
       alert(`Bem-vindo, ${data.username || data.email}`);
       router.push("/admin/dashboard"); // redireciona após login
